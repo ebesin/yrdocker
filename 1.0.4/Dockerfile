@@ -99,6 +99,9 @@ RUN cp /etc/apt/sources.list /etc/apt/sources.list_backup \
 
 RUN apt-get install -y ros-melodic-plotjuggler-ros
 
+RUN rm /usr/local/lib/libuuid.so.1 \
+    && ln -s /lib/x86_64-linux-gnu/libuuid.so.1 /usr/local/lib/libuuid.so.1
+
 WORKDIR /ros/catkin_ws/
 
 CMD [ "bash" ]
