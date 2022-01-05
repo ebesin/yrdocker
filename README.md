@@ -1,72 +1,67 @@
 # yrdocker
-## 简介
-为跃然创客创建的docker镜像，集成了跃然创客项目运行所需要的所有环境及依赖。
-## 使用方式
-- **最佳实践**
 
-    - 本实验室的项目会用到`rviz`工具，因此在容器中最好能有可视化的功能。由于`linux`中的界面服务为`c/s`架构的，只需要在宿主机中配置好`xserver`服务允许容器中的客户端访问即可。
+## 使用`yrdocker`镜像
 
-      1. 在宿主机中输入以下命令
+#### 准备工作
 
-         ```bash
-         $ sudo apt install x11-xserver-utils	#安装xserver-utils工具
-         
-         $ xhost +	#允许所有客户端访问xserver服务
-         ```
+1. 在宿主机中配置，输入以下命令
 
-      2. 启动容器时挂载相关目录及配置环境变量
+   ```bash
+   $ sudo apt install x11-xserver-utils	#安装xserver-utils工具
+   
+   $ xhost +	#允许所有客户端访问xserver服务
+   ```
 
-         - 启动时需要添加如下参数：
+2. 拉取镜像到本地
 
-           ```bash
-           -v /tmp/.X11-unix:/tmp/.X11-unix
-           -e DISPLAY=$DISPLAY
-           ```
+   ```bash
+   $ docker pull ebesin/yrdocker:1.0.5
+   ```
 
-         - 示例：
+#### 使用镜像
 
-           ```bash
-           docker run -dit --name yrtest \
-           -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY \
-           ebesin/yrdocker:1.0.3 bash
-           ```
+1. 以`yrdocker`镜像为基础层启动容器
 
-          上述命令启动了一个以`ebesin/yrdocker:1.0.3`镜像为基础层的容器，并能在容器中支持可视化展示。
+   ```bash
+   $ docker run -dit --name yrdocker \
+   -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro \
+   --privileged -e DISPLAY=$DISPLAY -p 9091:9091 -P\
+   --mount type=bind,source=/home/dwayne/workspace/src,target=/ros/catkin_ws/src \
+   ebesin/yrdocker:1.0.5
+   ```
 
-    - 创建容器时最好将工作空间挂载到`/ros/catkin_ws`目录下：
+   - 参数解释
 
-      ```bash
-      docker run -dit --name yrtest \
-      -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY \
-      --mount type=bind,source=/home/amov/dwayne/catkin_ws,target=/ros/catkin_ws \
-      ebesin/yrdocker:1.0.3 bash
-      ```
+     - `-dit`参数对应的完整参数是`-d -i -t`：后台运行容器，并且容器会被分配终端。
 
-      该命令将宿主机中工作空间下的源文件挂载到了`ros/catkin_ws`目录，这样，在启动容器后可以直接编译源文件。
+     - `--name yrtest`参数：为容器设置名字为`yrtest`
 
-    - 容器运行时产生一些程序结果数据一定要保存在`/ros/data`目录下，这样才是持久化保存的，保存到其他位置的话在容器删除时，数据也会丢失！。
+     - `-v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY`:挂载与显示输出相关的目录
 
-    - 运行实例：
+     - `--mount type=bind,source=/home/amov/dwayne/catkin_ws/src,target=/ros/catkin_ws/src`:将宿主机中的原代码目录挂载到容器中，使用时需要将`/home/amov/dwayne/catkin_ws/src`替换为自己电脑中的src目录。该行也可以写为
 
-      ```bash
-      # 启动容器
-      amov@yr:~$ docker run -dit --name yrtest \
-      > -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -v /etc/localtime:/etc/localtime:ro --privileged\
-      > --mount type=bind,source=/home/amov/dwayne/catkin_ws,target=/ros/catkin_ws \
-      > ebesin/yrdocker:1.0.4 bash
-      e93361012c35a56e9be4887fe57abc49d054049166a3ae8561feedb83a2481e8
-      
-      # 进入容器，并编译代码
-      root@e93361012c35:/ros/catkin_ws# catkin_make
-      Base path: /ros/catkin_ws
-      Source space: /ros/catkin_ws/src
-      Build space: /ros/catkin_ws/build
-      Devel space: /ros/catkin_ws/devel
-      Install space: /ros/catkin_ws/install
-      ####
-      ......
-      
-      # 这样代码就编译完成，接下来source一下，就可以直接执行对应的程序了
-      ```
+       `-v /home/amov/dwayne/catkin_ws/src:/ros/catkin_ws/src`
 
-    
+     - `ebesin/yrdocker:1.0.5:`指定要基于哪个镜像创建容器，本例中为`ebesin/yrdocker:1.0.5`
+
+   启动成功后应该会返回该容器的`ID`
+
+2. 进入容器
+
+   ```bash
+   $ docker exec -it yrtest bash
+   ```
+
+   - 参数解释
+     - `-it`:与`docker run`命令的参数含义一样
+     - `yrtest`:要进入的容器名，也可以替换为容器`ID`
+     - `bash`:进入容器所运行的进程，这里就写`bash`就好
+
+3. 在容器中操作
+
+   进入容器后就可以和正常的ubuntu电脑一样操作了，进入容器后的默认目录为`/ros/catkin_ws`，可以直接运行`catkin_make`命令进行编译。
+
+#### 一些注意事项
+
+- 在创建镜像时设置了默认的工作空间为`/ros/catkin_ws`，所以最好将宿主机中的工作区下的源码目录挂载到该目录下，就如上面的例子所示。
+- **\*在容器里面运行代码时，如果有需要保存的运行时数据，一定要保存在`/ros/data`目录下，因为容器运行时产生的数据不是持久化的，如果不保存在该目录下，在容器删除时数据也会丢失！**
