@@ -20,7 +20,7 @@
 
            ```bash
            -v /tmp/.X11-unix:/tmp/.X11-unix
-           -e DISPLAY=$DISPLAYhttps://github.com/ebesin/yrdocker
+           -e DISPLAY=$DISPLAY
            ```
 
          - 示例：
@@ -69,4 +69,4 @@
       # 这样代码就编译完成，接下来source一下，就可以直接执行对应的程序了
       ```
 
-      
+    
