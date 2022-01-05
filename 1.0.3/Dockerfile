@@ -3,6 +3,7 @@ FROM $FROM_IMAGE
 
 # clone ros package
 WORKDIR /ros/catkin_ws/
+VOLUME [ "/ros/data" ]
 COPY catkin_ws/src ./src
 
 # install build tools
