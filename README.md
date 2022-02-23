@@ -25,7 +25,7 @@
    ```bash
    $ docker run -dit --name yrdocker \
    -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro \
-   --privileged -e DISPLAY=$DISPLAY -p 9091:9091 -P\
+   --privileged -e DISPLAY=$DISPLAY --net=host\
    --mount type=bind,source=/home/dwayne/workspace/src,target=/ros/catkin_ws/src \
    ebesin/yrdocker:1.0.5
    ```
@@ -38,9 +38,9 @@
 
      - `-v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY`:挂载与显示输出相关的目录
 
-     - `--mount type=bind,source=/home/amov/dwayne/catkin_ws/src,target=/ros/catkin_ws/src`:将宿主机中的原代码目录挂载到容器中，使用时需要将`/home/amov/dwayne/catkin_ws/src`替换为自己电脑中的src目录。该行也可以写为
+     - `--mount type=bind,source=/home/dwayne/workspace/src,target=/ros/catkin_ws/src`:将宿主机中的原代码目录挂载到容器中，使用时需要将`/home/dwayne/workspace/src`替换为自己电脑中的src目录。该行也可以写为
 
-       `-v /home/amov/dwayne/catkin_ws/src:/ros/catkin_ws/src`
+       `-v /home/dwayne/workspace/src:/ros/catkin_ws/src`
 
      - `ebesin/yrdocker:1.0.5:`指定要基于哪个镜像创建容器，本例中为`ebesin/yrdocker:1.0.5`
 
@@ -49,7 +49,7 @@
 2. 进入容器
 
    ```bash
-   $ docker exec -it yrtest bash
+   $ docker exec -it yrdocker bash
    ```
 
    - 参数解释
