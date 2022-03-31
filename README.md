@@ -15,7 +15,7 @@
 2. 拉取镜像到本地
 
    ```bash
-   $ docker pull ebesin/yrdocker:1.0.5
+   $ docker pull ebesin/yrdocker:latest
    ```
 
 #### 使用镜像
@@ -26,8 +26,8 @@
    $ docker run -dit --name yrdocker \
    -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro \
    --privileged -e DISPLAY=$DISPLAY --net=host\
-   --mount type=bind,source=/home/dwayne/workspace/src,target=/ros/catkin_ws/src \
-   ebesin/yrdocker:1.0.5
+   --mount type=bind,source=/home/dwayne/workspace/src,target=/root/catkin_ws/src \
+   ebesin/yrdocker:latest
    ```
 
    - 参数解释
@@ -38,11 +38,11 @@
 
      - `-v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY`:挂载与显示输出相关的目录
 
-     - `--mount type=bind,source=/home/dwayne/workspace/src,target=/ros/catkin_ws/src`:将宿主机中的原代码目录挂载到容器中，使用时需要将`/home/dwayne/workspace/src`替换为自己电脑中的src目录。该行也可以写为
+     - `--mount type=bind,source=/home/dwayne/workspace/src,target=/root/catkin_ws/src`:将宿主机中的原代码目录挂载到容器中，使用时需要将`/home/dwayne/workspace/src`替换为自己电脑中的src目录。该行也可以写为
 
        `-v /home/dwayne/workspace/src:/ros/catkin_ws/src`
 
-     - `ebesin/yrdocker:1.0.5:`指定要基于哪个镜像创建容器，本例中为`ebesin/yrdocker:1.0.5`
+     - `ebesin/yrdocker:latest:`指定要基于哪个镜像创建容器，本例中为`ebesin/yrdocker:latest`
 
    启动成功后应该会返回该容器的`ID`
 
@@ -59,7 +59,7 @@
 
 3. 在容器中操作
 
-   进入容器后就可以和正常的ubuntu电脑一样操作了，进入容器后的默认目录为`/ros/catkin_ws`，可以直接运行`catkin_make`命令进行编译。
+   进入容器后就可以和正常的ubuntu电脑一样操作了，进入容器后的默认目录为`/root/catkin_ws`，可以直接运行`catkin_make`命令进行编译。
 
 #### 一些注意事项
 
